@@ -87,6 +87,8 @@ def main():
 
     with open(FILE, "w", encoding="utf-8") as f:
         json.dump(nuova, f, ensure_ascii=False, indent=2)
-
 if __name__ == "__main__":
-    main()
+    if os.getenv("TEST_TELEGRAM") == "1":
+        invia_telegram("🔴 TEST ALERT LA NAZIONE\n\nIl collegamento GitHub → Telegram funziona!")
+    else:
+        main()
