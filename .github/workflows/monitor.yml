@@ -2,8 +2,7 @@ name: Alert apertura La Nazione
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
-      
+    - cron: '*/5 * * * *'     
   workflow_dispatch:
 
 permissions:
