@@ -1,0 +1,47 @@
+name: Alert apertura La Nazione
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+      timezone: 'Europe/Rome'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: monitor-apertura
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scarica progetto
+        uses: actions/checkout@v4
+
+      - name: Installa Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Installa librerie
+        run: pip install requests beautifulsoup4
+
+      - name: Controlla apertura
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python monitor.py
+
+      - name: Salva ultimo titolo
+        run: |
+          if [ -f ultimo_titolo.json ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add ultimo_titolo.json
+            if ! git diff --cached --quiet; then
+              git commit -m "Aggiorna apertura"
+              git push
+            fi
+          fi
